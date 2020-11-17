@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -15,7 +16,9 @@ import {
 
 import api from '../../service/api';
 
-export default function App() {
+export default function Techs() {
+  const navigation = useNavigation();
+
   const [loading, setLoading] = useState(false);
   const [techs, setTechs] = useState([]);
   const [newTech, setNewTech] = useState(null);
@@ -41,6 +44,10 @@ export default function App() {
     const filteredTechs = techs.filter((item) => item.id !== id);
 
     setTechs(filteredTechs);
+  }
+
+  function navigationToDetail(tech) {
+    navigation.navigate('TechDetails', { tech });
   }
 
   return (
@@ -70,7 +77,10 @@ export default function App() {
           <Tech>
             <Name>{item.id}</Name>
 
-            <ProfileButtom background="#ffc107" onPress={() => {}}>
+            <ProfileButtom
+              background="#ffc107"
+              onPress={() => navigationToDetail(item)}
+            >
               <Icon name="design-services" size={20} color="#fff" />
             </ProfileButtom>
 
