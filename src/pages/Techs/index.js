@@ -1,24 +1,88 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Keyboard } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    textAlign: 'center',
-    margin: 10,
-  },
-});
+import {
+  Container,
+  Form,
+  Input,
+  List,
+  Name,
+  ProfileButtom,
+  SubmitButton,
+  Tech,
+} from './styles';
+
+import api from '../../service/api';
 
 export default function App() {
+  const [loading, setLoading] = useState(false);
+  const [techs, setTechs] = useState([]);
+  const [newTech, setNewTech] = useState(null);
+
+  async function handleAddTech() {
+    setLoading(true);
+
+    const { data } = await api.post('/techs/', {
+      id: newTech,
+    });
+
+    setTechs([...techs, data]);
+
+    setLoading(false);
+
+    setNewTech(null);
+
+    Keyboard.dismiss();
+  }
+
+  async function handleDeleteTech(id) {
+    await api.delete(`/techs/${id}`);
+    const filteredTechs = techs.filter((item) => item.id !== id);
+
+    setTechs(filteredTechs);
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hello, DIO!!!</Text>
-    </View>
+    <Container>
+      <Form>
+        <Input
+          autoCorrect={false}
+          autoCapitalize="none"
+          placeholder="Adicionar Tecnologia"
+          value={newTech}
+          onChangeText={setNewTech}
+          returnKeyType="send"
+          onSubmitEditing={handleAddTech}
+        />
+        <SubmitButton loading={loading} onPress={handleAddTech}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Icon name="add" size={20} color="#fff" />
+          )}
+        </SubmitButton>
+      </Form>
+      <List
+        data={techs}
+        keyExtractor={(tech) => tech.id}
+        renderItem={({ item }) => (
+          <Tech>
+            <Name>{item.id}</Name>
+
+            <ProfileButtom background="#ffc107" onPress={() => {}}>
+              <Icon name="design-services" size={20} color="#fff" />
+            </ProfileButtom>
+
+            <ProfileButtom
+              background="#e0a800"
+              onPress={() => handleDeleteTech(item.id)}
+            >
+              <Icon name="delete" size={20} color="#fff" />
+            </ProfileButtom>
+          </Tech>
+        )}
+      />
+    </Container>
   );
 }
