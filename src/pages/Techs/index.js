@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -22,6 +22,11 @@ export default function Techs() {
   const [loading, setLoading] = useState(false);
   const [techs, setTechs] = useState([]);
   const [newTech, setNewTech] = useState(null);
+
+  async function loadPage() {
+    const { data } = await api.get('/techs');
+    setTechs(data);
+  }
 
   async function handleAddTech() {
     setLoading(true);
@@ -49,6 +54,10 @@ export default function Techs() {
   function navigationToDetail(tech) {
     navigation.navigate('TechDetails', { tech });
   }
+
+  useEffect(() => {
+    loadPage();
+  }, []);
 
   return (
     <Container>
